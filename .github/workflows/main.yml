@@ -17,4 +17,4 @@ jobs:
         files: "TRUSTFRAMEWORKBASE.xml"
         tenant: ${{ env.tenant }}
         clientId: ${{ env.clientId }}
-        clientSecret: ${{ secrets.clientSecret2 }}
+        clientSecret: ${{ secrets.clientSecret}}
