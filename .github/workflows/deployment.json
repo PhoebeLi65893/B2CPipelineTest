@@ -2,7 +2,13 @@
     "version": "1.0",
     "files": [
         {
-            "path": "Policies/TRUSTFRAMEWORKBASE.xml"
+            "path": "Policies/TRUSTFRAMEWORKBASE.xml",
+            "replacements": [
+                {
+                    "find": "<Item Key=\"issuer\">https://yourtenant.b2clogin.com/00000000-0000-0000-0000-000000000000/v2.0/</Item>",
+                    "replace": "<Item Key=\"issuer\">https://lichenfeigmail1.b2clogin.com/3a29c594-12be-476f-bb6f-0a787b348639/v2.0/</Item>"
+                }
+            ]
         }
     ]
 }
