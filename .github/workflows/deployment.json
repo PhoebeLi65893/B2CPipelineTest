@@ -6,7 +6,7 @@
             "replacements": [
                 {
                     "find": "<Item Key=\"issuer\">https://yourtenant.b2clogin.com/00000000-0000-0000-0000-000000000000/v2.0/</Item>",
-                    "replace": "<Item Key=\"issuer\">https://lichenfeigmail1.b2clogin.com/3a29c594-12be-476f-bb6f-0a787b348639/v2.0/</Item>"
+                    "replace": "<Item Key=\"issuer\">https://lichenfeigmail1.b2clogin.com/c201e915-dc6f-4cb7-850b-9d973cf440b7/v2.0/</Item>"
                 }
             ]
         }
