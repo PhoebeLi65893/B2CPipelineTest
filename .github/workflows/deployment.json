@@ -2,7 +2,7 @@
     "version": "1.0",
     "files": [
         {
-            "path": "Policies/TRUSTFRAMEWORKBASE.xml",
+            "path": "Policies/test.xml",
             "replacements": [
                 {
                     "find": "<Item Key=\"issuer\">https://yourtenant.b2clogin.com/00000000-0000-0000-0000-000000000000/v2.0/</Item>",
