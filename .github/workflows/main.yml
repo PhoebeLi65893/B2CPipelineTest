@@ -1,7 +1,7 @@
 on: push
 
 env:
-  clientId: 44d6e2c2-7665-40d0-8812-15460acb37ae
+  clientId: 0ea625e6-47cc-4ba5-b519-307daed67a46
   tenant: lichenfeigmail1.onmicrosoft.com
 
 jobs:
