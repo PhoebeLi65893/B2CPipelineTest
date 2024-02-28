@@ -1,0 +1,23 @@
+on: push
+
+env:
+  clientId: 0ea625e6-47cc-4ba5-b519-307daed67a46
+  tenant: lichenfeigmail1.onmicrosoft.com
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: 'Upload TrustFrameworkBase Policy'
+      uses: azure-ad-b2c/deploy-trustframework-policy@v5.3
+      with:
+        folder: "./"
+        files: "deployment.json"
+        tenant: ${{ env.tenant }}
+        clientId: ${{ env.clientId }}
+        clientSecret: ${{ secrets.clientSecret}}
+        renumberSteps: true
+        addAppInsightsStep: false
+        verbose: true
