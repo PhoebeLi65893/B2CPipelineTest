@@ -1,0 +1,308 @@
+<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="lichenfeigmail1.onmicrosoft.com" PolicyId="B2C_1A_CICD_TrustFrameworkExtensions" PublicPolicyUri="http://lichenfeigmail1.onmicrosoft.com/B2C_1A_CICD_TrustFrameworkExtensions" TenantObjectId="c201e915-dc6f-4cb7-850b-9d973cf440b7">
+  <BasePolicy>
+    <TenantId>lichenfeigmail1.onmicrosoft.com</TenantId>
+    <PolicyId>B2C_1A_CICD_TrustFrameworkBase</PolicyId>
+  </BasePolicy>
+  <BuildingBlocks>
+    <ClaimsSchema>
+      <ClaimType Id="platformId">
+        <DisplayName>platformId</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="ProviderUserId">
+        <DisplayName>ProviderUserId</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="SubscriptionCreated">
+        <DisplayName>SubscriptionCreated</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="username">
+        <DisplayName>User name or email address that the user can use to sign in</DisplayName>
+        <DataType>string</DataType>
+        <UserHelpText>Request username</UserHelpText>
+      </ClaimType>
+      <!-- <ClaimType Id="platformId"> -->
+      <!-- <DisplayName>{OAUTH-KV:platformId}</DisplayName> -->
+      <!-- <DataType>string</DataType> -->
+      <!-- <UserHelpText>platformId</UserHelpText> -->
+      <!-- <UserInputType>Readonly</UserInputType> -->
+      <!-- </ClaimType> -->
+      <!-- <ClaimType Id="ProviderUserId"> -->
+      <!-- <DisplayName>{OAUTH-KV:ProviderUserId}</DisplayName> -->
+      <!-- <DataType>string</DataType> -->
+      <!-- <UserHelpText>ProviderUserId</UserHelpText> -->
+      <!-- <UserInputType>Readonly</UserInputType> -->
+      <!-- </ClaimType> -->
+      <!-- <ClaimType Id="SubscriptionCreated"> -->
+      <!-- <DisplayName>{OAUTH-KV:SubscriptionCreated}</DisplayName> -->
+      <!-- <DataType>string</DataType> -->
+      <!-- <UserHelpText>SubscriptionCreated</UserHelpText> -->
+      <!-- <UserInputType>Readonly</UserInputType> -->
+      <!-- </ClaimType> -->
+      <ClaimType Id="resource">
+        <DisplayName>The resource parameter passes to the ROPC endpoint</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="refreshTokenIssuedOnDateTime">
+        <DisplayName>An internal parameter used to determine whether the user should be permitted to authenticate again using their existing refresh token.</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="refreshTokensValidFromDateTime">
+        <DisplayName>An internal parameter used to determine whether the user should be permitted to authenticate again using their existing refresh token.</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="tfp">
+        <DisplayName>Trust framework policy name</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="logonIdentifier">
+        <DisplayName>User name or email address that the user can use to sign in</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+    </ClaimsSchema>
+    <ClaimsTransformations>
+      <!-- <ClaimsTransformation Id="CreateRandomValue" TransformationMethod="CreateRandomString"> -->
+      <!-- <InputParameters> -->
+      <!-- <InputParameter Id="randomGeneratorType" DataType="string" Value="integer" /> -->
+      <!-- </InputParameters> -->
+      <!-- <OutputClaims> -->
+      <!-- <OutputClaim ClaimTypeReferenceId="RandomValue" TransformationClaimType="outputClaim" /> -->
+      <!-- </OutputClaims> -->
+      <!-- </ClaimsTransformation> -->
+      <ClaimsTransformation Id="CreateSubjectClaimFromObjectID" TransformationMethod="CreateStringClaim">
+        <InputParameters>
+          <InputParameter Id="value" DataType="string" Value="Not supported currently. Use oid claim." />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="sub" TransformationClaimType="createdClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+      <ClaimsTransformation Id="AssertRefreshTokenIssuedLaterThanValidFromDate" TransformationMethod="AssertDateTimeIsGreaterThan">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="refreshTokenIssuedOnDateTime" TransformationClaimType="leftOperand" />
+          <InputClaim ClaimTypeReferenceId="refreshTokensValidFromDateTime" TransformationClaimType="rightOperand" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="AssertIfEqualTo" DataType="boolean" Value="false" />
+          <InputParameter Id="AssertIfRightOperandIsNotPresent" DataType="boolean" Value="true" />
+        </InputParameters>
+      </ClaimsTransformation>
+    </ClaimsTransformations>
+  </BuildingBlocks>
+  <ClaimsProviders>
+    <ClaimsProvider>
+      <DisplayName>Local Account SignIn</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="ResourceOwnerPasswordCredentials-OAUTH2">
+          <DisplayName>Local Account SignIn</DisplayName>
+          <Protocol Name="OpenIdConnect" />
+          <Metadata>
+            <Item Key="UserMessageIfClaimsPrincipalDoesNotExist">We can't seem to find your account</Item>
+            <Item Key="UserMessageIfInvalidPassword">Your password is incorrect</Item>
+            <Item Key="UserMessageIfOldPasswordUsed">Looks like you used an old password</Item>
+            <Item Key="DiscoverMetadataByTokenIssuer">true</Item>
+            <Item Key="ValidTokenIssuerPrefixes">https://sts.windows.net/</Item>
+            <Item Key="METADATA">https://login.microsoftonline.com/{tenant}/.well-known/openid-configuration</Item>
+            <Item Key="authorization_endpoint">https://login.microsoftonline.com/{tenant}/oauth2/token</Item>
+            <Item Key="response_types">id_token</Item>
+            <Item Key="response_mode">query</Item>
+            <Item Key="scope">email openid</Item>
+            <Item Key="grant_type">password</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="logonIdentifier" PartnerClaimType="username" Required="true" DefaultValue="{OIDC:Username}" />
+            <InputClaim ClaimTypeReferenceId="password" Required="true" DefaultValue="{OIDC:Password}" />
+            <InputClaim ClaimTypeReferenceId="grant_type" DefaultValue="password" />
+            <InputClaim ClaimTypeReferenceId="scope" DefaultValue="openid" />
+            <InputClaim ClaimTypeReferenceId="nca" PartnerClaimType="nca" DefaultValue="1" />
+            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="e00e055d-1f55-49b5-a7ba-93526edf9f61" />
+            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="fd19297b-9883-475b-85a9-f22ca7cb3d68" />
+            <InputClaim ClaimTypeReferenceId="platformId" AlwaysUseDefaultValue="true" DefaultValue="{OAUTH-KV:platformId}" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="oid" />
+            <OutputClaim ClaimTypeReferenceId="platformId" />
+            <!-- <OutputClaim ClaimTypeReferenceId="userPrincipalName" PartnerClaimType="upn" /> -->
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromObjectID" />
+          </OutputClaimsTransformations>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>ClaimsLookup API</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="AzureFunctions-LookUpClaimsWebHook">
+          <DisplayName>Azure Function Web Hook</DisplayName>
+          <!-- <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" /> -->
+          <!-- <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" /> -->
+          <Protocol Name="None" />
+          <!-- <Metadata> -->
+          <!-- <Item Key="ServiceUrl">https://webhook.site/07c91bde-8786-4076-8419-d0bd6192319c</Item> -->
+          <!-- <Item Key="AuthenticationType">None</Item> -->
+          <!-- <Item Key="HttpBinding">GET</Item> -->
+          <!-- <Item Key="SendClaimsIn">Header</Item> -->
+          <!-- <Item Key="AllowInsecureAuthInProduction">true</Item> -->
+          <!-- </Metadata> -->
+          <Metadata>
+            <!-- <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item> -->
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="platformId" AlwaysUseDefaultValue="true" DefaultValue="{OAUTH-KV:platformId}" />
+            <!-- <InputClaim ClaimTypeReferenceId="ProviderUserId" AlwaysUseDefaultValue="true" DefaultValue="{OAUTH-KV:ProviderUserId}" /> -->
+            <!-- <InputClaim ClaimTypeReferenceId="SubscriptionCreated" AlwaysUseDefaultValue="true" DefaultValue="{OAUTH-KV:SubscriptionCreated}" /> -->
+          </InputClaims>
+          <OutputClaims>
+            <!-- <OutputClaim ClaimTypeReferenceId="objectId" /> -->
+            <OutputClaim ClaimTypeReferenceId="platformId" />
+            <!-- <OutputClaim ClaimTypeReferenceId="ProviderUserId" /> -->
+            <!-- <OutputClaim ClaimTypeReferenceId="SubscriptionCreated" /> -->
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>Azure Active Directory</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="AAD-UserReadUsingObjectId-CheckRefreshTokenDate">
+          <Metadata>
+            <Item Key="Operation">Read</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="objectId" />
+            <OutputClaim ClaimTypeReferenceId="refreshTokensValidFromDateTime" />
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="AssertRefreshTokenIssuedLaterThanValidFromDate" />
+            <OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromObjectID" />
+          </OutputClaimsTransformations>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>Session Management</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="SM-RefreshTokenReadAndSetup">
+          <DisplayName>Trustframework Policy Engine Refresh Token Setup Technical Profile</DisplayName>
+          <Protocol Name="None" />
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="objectId" />
+            <OutputClaim ClaimTypeReferenceId="refreshTokenIssuedOnDateTime" />
+          </OutputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>Token Issuer</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="JwtIssuer">
+          <Metadata>
+            <!-- Point to the redeem refresh token user journey-->
+            <Item Key="ClientCredentialsUserJourneyId">ClientCredentialsJourney</Item>
+          </Metadata>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>Client credintial technical profiles</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="ClientCredentials_Setup">
+          <DisplayName>Trustframework Policy Client Credentials Setup Technical Profile</DisplayName>
+          <Protocol Name="None" />
+          <Metadata>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+          </Metadata>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="platformId" DefaultValue="{OAUTH-KV:platformId}" AlwaysUseDefaultValue="true" />
+            <OutputClaim ClaimTypeReferenceId="ProviderUserId" DefaultValue="{OAUTH-KV:ProviderUserId}" AlwaysUseDefaultValue="true" />
+            <OutputClaim ClaimTypeReferenceId="SubscriptionCreated" DefaultValue="{OAUTH-KV:SubscriptionCreated}" AlwaysUseDefaultValue="true" />
+            <OutputClaim ClaimTypeReferenceId="objectId" />
+          </OutputClaims>
+        </TechnicalProfile>
+        <!-- <TechnicalProfile Id="TokenAugmentation"> -->
+        <!-- <DisplayName>Unlink Facebook</DisplayName> -->
+        <!-- <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" /> -->
+        <!-- <OutputClaims> -->
+        <!-- <OutputClaim ClaimTypeReferenceId="RandomValue" /> -->
+        <!-- </OutputClaims> -->
+        <!-- <OutputClaimsTransformations> -->
+        <!-- <OutputClaimsTransformation ReferenceId="CreateRandomValue" /> -->
+        <!-- </OutputClaimsTransformations> -->
+        <!-- <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" /> -->
+        <!-- </TechnicalProfile> -->
+      </TechnicalProfiles>
+    </ClaimsProvider>
+  </ClaimsProviders>
+  <UserJourneys>
+    <UserJourney Id="ResourceOwnerPasswordCredentials">
+      <PreserveOriginalAssertion>false</PreserveOriginalAssertion>
+      <OrchestrationSteps>
+        <!-- <OrchestrationStep Order="1" Type="ClaimsExchange"> -->
+        <!-- <ClaimsExchanges> -->
+        <!-- <ClaimsExchange Id="ResourceOwnerFlow" TechnicalProfileReferenceId="ResourceOwnerPasswordCredentials-OAUTH2" /> -->
+        <!-- </ClaimsExchanges> -->
+        <!-- </OrchestrationStep> -->
+        <!-- <OrchestrationStep Order="2" Type="ClaimsExchange"> -->
+        <!-- <ClaimsExchanges> -->
+        <!-- <ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" /> -->
+        <!-- </ClaimsExchanges> -->
+        <!-- </OrchestrationStep> -->
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetCustomClaims" TechnicalProfileReferenceId="AzureFunctions-LookUpClaimsWebHook" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="2" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+      </OrchestrationSteps>
+    </UserJourney>
+    <UserJourney Id="ResourceOwnerPasswordCredentials-RedeemRefreshToken">
+      <PreserveOriginalAssertion>false</PreserveOriginalAssertion>
+      <OrchestrationSteps>
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="RefreshTokenSetupExchange" TechnicalProfileReferenceId="SM-RefreshTokenReadAndSetup" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="CheckRefreshTokenDateFromAadExchange" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId-CheckRefreshTokenDate" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="3" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+      </OrchestrationSteps>
+    </UserJourney>
+    <UserJourney Id="ClientCredentialsJourney">
+      <OrchestrationSteps>
+        <!-- Do the client credentials and emit some claims -->
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="ClientCredSetupExchange" TechnicalProfileReferenceId="ClientCredentials_Setup" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <!-- Call a REST API or claims transformation -->
+        <!-- <OrchestrationStep Order="2" Type="ClaimsExchange"> -->
+        <!-- <ClaimsExchanges> -->
+        <!-- <ClaimsExchange Id="TokenAugmentation" TechnicalProfileReferenceId="TokenAugmentation" /> -->
+        <!-- </ClaimsExchanges> -->
+        <!-- </OrchestrationStep> -->
+        <!-- <OrchestrationStep Order="3" Type="ClaimsExchange"> -->
+        <!-- <ClaimsExchanges> -->
+        <!-- <ClaimsExchange Id="GetCustomClaims" TechnicalProfileReferenceId="AzureFunctions-LookUpClaimsWebHook" /> -->
+        <!-- </ClaimsExchanges> -->
+        <!-- </OrchestrationStep> -->
+        <!-- Send the claims -->
+        <OrchestrationStep Order="2" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+      </OrchestrationSteps>
+    </UserJourney>
+  </UserJourneys>
+</TrustFrameworkPolicy>

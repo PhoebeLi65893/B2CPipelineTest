@@ -1,0 +1,25 @@
+<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="lichenfeigmail1.onmicrosoft.com" PolicyId="B2C_1A_CICD_signup_signin" PublicPolicyUri="http://lichenfeigmail1.onmicrosoft.com/B2C_1A_CICD_signup_signin" TenantObjectId="c201e915-dc6f-4cb7-850b-9d973cf440b7">
+  <BasePolicy>
+    <TenantId>lichenfeigmail1.onmicrosoft.com</TenantId>
+    <PolicyId>B2C_1A_CICD_TrustFrameworkExtensions</PolicyId>
+  </BasePolicy>
+  <RelyingParty>
+    <DefaultUserJourney ReferenceId="ClientCredentialsJourney" />
+    <TechnicalProfile Id="PolicyProfile">
+      <DisplayName>PolicyProfile</DisplayName>
+      <Protocol Name="OpenIdConnect" />
+      <OutputClaims>
+        <!-- <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" DefaultValue="1234"/> -->
+        <!-- <OutputClaim ClaimTypeReferenceId="sub" /> -->
+        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+        <OutputClaim ClaimTypeReferenceId="displayName" DefaultValue="" />
+        <OutputClaim ClaimTypeReferenceId="givenName" DefaultValue="" />
+        <OutputClaim ClaimTypeReferenceId="surname" DefaultValue="" />
+        <OutputClaim ClaimTypeReferenceId="platformId" DefaultValue="No Value" />
+        <OutputClaim ClaimTypeReferenceId="ProviderUserId" DefaultValue="No Value" />
+        <OutputClaim ClaimTypeReferenceId="SubscriptionCreated" DefaultValue="No Value" />
+      </OutputClaims>
+      <SubjectNamingInfo ClaimType="sub" />
+    </TechnicalProfile>
+  </RelyingParty>
+</TrustFrameworkPolicy>
