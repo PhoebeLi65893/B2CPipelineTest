@@ -19,6 +19,6 @@ jobs:
         clientId: ${{ env.clientId }}
         clientSecret: ${{ secrets.clientSecret}}
         renumberSteps: true
-        addAppInsightsStep: true
+        addAppInsightsStep: false
         verbose: true
 
